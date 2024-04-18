@@ -9,7 +9,8 @@ baseCsv = 'data/Supernatural-Season'
 badChars = ['♪']
 
 allTranscripts = req.get(baseUrl + '/Category:Transcripts')
-episodeCount = 0
+episodeCount = 1
+isStopping = False
 
 if allTranscripts:
     all = BeautifulSoup(allTranscripts.content, 'html.parser')
@@ -37,7 +38,7 @@ if allTranscripts:
                         isSetting = item.find('b')
                         if isLine and not isSetting:
                             content = item.contents
-                            if content and len(content) == 3 and isinstance(content[0], str) and isinstance(content[2], str) and len(content[0].split()) == 1 and content[0].lower() != 'music':
+                            if content and len(content) == 3 and isinstance(content[0], str) and isinstance(content[2], str) and len(content[0].split()) == 1 and content[0].lower() != 'music'  and content[2] != '':
                                 speaker = content[0].strip()
                                 line = content[2].strip()
 
@@ -48,5 +49,5 @@ if allTranscripts:
                     print("fail")
             
                 episodeCount += 1
-
+                
         seasonCount += 1
