@@ -1,4 +1,4 @@
-d3.csv('data/Supernatural-Season1.csv')
+d3.csv('data/Supernatural.csv')
 .then(data => {
     console.log(data);
 })
