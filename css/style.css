@@ -28,6 +28,34 @@
     padding-left: 20px;
 }
 
+
+.character {
+    text-align: center;
+    flex-basis: 48%;
+}
+
+.char-images {
+    max-width: 60%;
+    height: auto;
+}
+
+.summary {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.description {
+    align-items: justify;
+    justify-content: center; /* Center characters horizontally */
+    margin-bottom: 20px;
+}
+.source {
+    font-size: 14px;
+    text-align: center;
+}
+
 .control {
     align-items: center;
     justify-content: center;
