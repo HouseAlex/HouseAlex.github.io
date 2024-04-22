@@ -3,32 +3,57 @@
 
 <head>
     <title>TV Show Visualization Project - Supernatural</title>
-    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
-    <link rel="stylesheet" href="css/leaflet.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="sreen">
+        <div class="control" style="margin-bottom: 10px;">
+            <button id="toggleDescription">Toggle Description</button>
+        </div>
+        <div id="description" class="control" style="display: flex; margin-bottom: 10px;">
+            <div class="character">
+                <img src="images/dean.jpg" class="char-images" style="margin-right: 10px;">
+                <p>Dean Winchester</p>
+            </div>
+            <div class="description" style="width: 1000px;">
+                <img src="images/sn-titlecard-cropped2.jpg">
+                <p class="summary">Supernatural is a drama consisting of action, mystery, and horror. It aired on The CW from 2005 till 2020.</p>
 
-    <div class="container">
-        <label style="margin-bottom:0%;">Season Selector</label>
-        <select id="seasonSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
-    </div>
+                <p class="description">The series main characters are brothers Dean (left) and Sam (right). The episodic drama follows them as they travel throughout the United States hunting evil supernatural creatures all in Dean's classic black 67' Impala.  After losing their mother to a supernatural force, the brothers were raised by their father as soldiers who track mysterious and demonic creatures. Violent memories and relationship-threatening secrets add additional burdens on Sam and Dean as they investigate all things that go bump in the night. As old tricks and tools are rendered useless and friends betray them, the brothers must rely on each other as they encounter new enemies. There are overarching plots throughout the seasons that bring in the main supporting cast, which consist of other hunters, demons, and angels.</p>
 
-    <div class="container">
-        <label style="margin-bottom:0%;">Speaker Selector</label>
-        <select id="speakerSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
-    </div>
+                <p class="description">The following website visualizes data scraped from the Supernatural Transcripts and depicts character specific data and interactions with other characters.</p>
 
-    <div class="screen-upper">
-        <div id="tooltip"></div>
-        <div id="characterNetwork"></div>
+                <p class="source">More information can be found <a href="http://www.supernaturalwiki.com/Supernatural_Wiki">here</a>.</p>
+            </div>
+            <div class="character">
+                <img src="images/sam.jpg" class="char-images" style="margin-left: 10px;">
+                <p>Sam Winchester</p>
+            </div>
+        </div>
+        <div class="control">
+            <div class="container-grid" style="margin-right: 10px;">
+                <label style="margin-bottom:5px;">Season Selector</label>
+                <select id="seasonSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
+            </div>
+            <div class="container-grid" style="margin-left: 10px;">
+                <label style="margin-bottom:5px;">Speaker Selector</label>
+                <select id="speakerSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
+            </div>
+        </div>
+        <div class="screen-upper">
+            <div id="barchart"></div>
+            <div id="barchart2"></div>
+        </div>
+        <div class="screen-lower">
+            <div id="characterNetwork"></div>
+                    
+            <div id="wordcloud"></div>
+        </div>
+    </div>   
 
-        <div id="barchart"></div>
-    </div>
-
-    <div id="barchart2"></div>
-
-    <div id="wordcloud"></div>
+    
+    <div id="tooltip"></div>
+    
 
     <script src="js/d3.v7.js"></script>
     <script src="js/main.js"></script>
