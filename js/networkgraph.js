@@ -17,6 +17,7 @@ class NetworkGraph {
 
         vis.ProcessData();
 
+        console.log(vis.links)
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
@@ -74,6 +75,7 @@ class NetworkGraph {
             .data(vis.links)
             .enter().append("line")
             .attr("class", "link")
+            .style("stroke-width", d => d.strength * 8)
             .style("stroke", "black");
 
         vis.node = vis.chart.selectAll(".node")
@@ -151,23 +153,33 @@ class NetworkGraph {
                     vis.nodes.push({ id: character });
                 }
             });
-    
+            
+            let interactions = {};
+            
             // Create links between characters in the scene
             for (let i = 0; i < characters.length - 1; i++) {
                 for (let j = i + 1; j < characters.length; j++) {
                     let source = characters[i];
                     let target = characters[j];
     
-                    // Check if link already exists
-                    let existingLink = vis.links.find(link => (link.source === source && link.target === target) || (link.source === target && link.target === source));
-    
-                    if (existingLink) {
-                        existingLink.value++;
-                    } else {
-                        vis.links.push({ source, target, value: 1 });
-                    }
+                    let interactionKey = source < target ? source + '-' + target : target + '-' + source;
+
+                    // Increment interaction count
+                    interactions[interactionKey] = (interactions[interactionKey] || 0) + 1;
                 }
             }
+
+            Object.entries(interactions).forEach(([interactionKey, frequency]) => {
+                let [source, target] = interactionKey.split('-');
+                vis.links.push({ source, target, freq: frequency });
+            });
+
+        });
+
+        
+        let maxFrequency = d3.max(vis.links, d => d.freq);
+        vis.links.forEach(link => {
+            link.strength = link.freq / maxFrequency; // Normalize to [0, 1] range
         });
     }
 }
