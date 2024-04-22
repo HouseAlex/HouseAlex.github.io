@@ -9,7 +9,7 @@ class BarChart {
         const vis = this;
 
         vis.margin = { top: 40, right: 20, bottom: 100, left: 80 };
-        vis.width = 960 - vis.margin.left - vis.margin.right;
+        vis.width = vis.config.width - vis.margin.left - vis.margin.right;
         vis.height = 500 - vis.margin.top - vis.margin.bottom;
 
         // Create SVG and append to the DOM

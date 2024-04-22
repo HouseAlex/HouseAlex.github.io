@@ -16,6 +16,13 @@ d3.csv('data/Supernatural.csv')
         .attr('value', d => d.value)
         .text(d => d.season)
 
+    speakerSelector = d3.select('#speakerSelector')
+        .selectAll('option')
+        .data(mainCast)
+        .enter().append('option')
+        .attr('value', d => d)
+        .text(d => d)
+
     for (let i = 0; i < data.length; i++){
         let d = data[i];
         if (mainCast.includes(d.speaker.toUpperCase())) {
@@ -30,6 +37,24 @@ d3.csv('data/Supernatural.csv')
         parentElement: '#characterNetwork'
     }, mainCastDialogue)
     characterNetwork.UpdateVis()
+
+    barchart = new BarChart({
+        parentElement: '#barchart',
+        parameter: 'speaker',
+        title: 'Line Count by Speaker',
+        xTitle: 'Speaker Name',
+        width: d3.select('#barchart').node().offsetWidth
+    }, mainCastDialogue);
+    barchart.UpdateVis();
+
+    barchart2 = new BarChart({
+        parentElement: '#barchart2',
+        parameter: 'episodeNum',
+        title: 'Line Count by Episode Number per Selected Speaker',
+        xTitle: 'Episode Number',
+        width: d3.select('#barchart2').node().offsetWidth
+    }, mainCastDialogue);
+    barchart.UpdateVis();
 
     // Season Selector updating NetworkGraph and BarChart
     d3.select('#seasonSelector')
@@ -49,38 +74,12 @@ d3.csv('data/Supernatural.csv')
             }
         })
 
-    barchart = new BarChart({
-        parentElement: '#barchart',
-        parameter: 'speaker',
-        title: 'Line Count by Speaker',
-        xTitle: 'Speaker Name'
-    }, mainCastDialogue);
-    barchart.UpdateVis();
-
-
-
-    speakerSelector = d3.select('#speakerSelector')
-        .selectAll('option')
-        .data(mainCast)
-        .enter().append('option')
-        .attr('value', d => d)
-        .text(d => d)
-
-    // Season Selector updating NetworkGraph and BarChart
+    // Speaker Selector updating NetworkGraph and BarChart
     d3.select('#speakerSelector')
         .on('change', function() {
                 let filtered = mainCastDialogue.filter(d => d.speaker == this.value)
                 barchart2.data = filtered
                 barchart2.UpdateVis();
         })
-
-
-    barchart2 = new BarChart({
-        parentElement: '#barchart2',
-        parameter: 'episodeNum',
-        title: 'Line Count by Episode Number per Selected Speaker',
-        xTitle: 'Episode Number'
-    }, mainCastDialogue);
-    barchart.UpdateVis();
 
 })
