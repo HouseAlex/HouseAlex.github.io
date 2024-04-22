@@ -41,6 +41,8 @@ d3.csv('data/Supernatural.csv')
                 characterNetwork.UpdateVis();
                 barchart.data = mainCastDialogueOG
                 barchart.UpdateVis();
+                barchart2.data = mainCastDialogueOG
+                barchart2.UpdateVis();
             }
             else {
                 let filtered = mainCastDialogue.filter(d => d.season == this.value)
@@ -48,6 +50,8 @@ d3.csv('data/Supernatural.csv')
                 characterNetwork.UpdateVis();
                 barchart.data = filtered
                 barchart.UpdateVis();
+                barchart2.data = filtered
+                barchart2.UpdateVis();
             }
         })
 
