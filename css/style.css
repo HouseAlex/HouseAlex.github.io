@@ -27,3 +27,27 @@
     margin: 5px 0 0 0;
     padding-left: 20px;
 }
+
+
+
+.container {
+    display: flex;
+    margin-bottom: 0px;
+}
+
+.container-grid {
+    display: grid;
+    row-gap: 0px;
+}
+
+.screen-upper {
+    gap: 20px;
+    display: grid;
+    grid-template-columns: 4fr 2fr;
+    row-gap: 0px;
+}
+
+.screen-lower {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
