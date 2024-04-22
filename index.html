@@ -2,24 +2,38 @@
 <html>
 
 <head>
-    <title>UFO Reporting Visualization Project</title>
+    <title>TV Show Visualization Project - Supernatural</title>
     <link rel="icon" href="data:;base64,iVBORwOKGO=" />
     <link rel="stylesheet" href="css/leaflet.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
     <div class="container">
-        <label style="margin-bottom:0%;">Color Selector</label>
+        <label style="margin-bottom:0%;">Season Selector</label>
         <select id="seasonSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
     </div>
-    <div id="tooltip"></div>
-    <div id="characterNetwork"></div>
+
+    <div class="screen-upper">
+        <div id="tooltip"></div>
+        <div id="characterNetwork"></div>
+
+        <div id="barchart"></div>
+    </div>
+
+    <div class="container">
+        <label style="margin-bottom:0%;">Speaker Selector</label>
+        <select id="speakerSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
+    </div>
+
+    <div id="barchart2"></div>
 
     <div id="wordcloud"></div>
-    
+
     <script src="js/d3.v7.js"></script>
     <script src="js/main.js"></script>
 
+    <script src="js/barchart.js"></script>
     <script src="js/networkgraph.js"></script>
     <script src="js/wordcloud.js"></script>
 </body>
