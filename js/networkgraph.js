@@ -115,10 +115,13 @@ class NetworkGraph {
                 vis.node.filter(neighbor => neighbors.includes(neighbor.id))
                     .attr("fill", "orange");
 
+                const svgPosition = document.getElementById('characterNetwork')
+                console.log(svgPosition)
+
                 d3.select('#tooltip')
                     .style('display', 'block')
-                    .style('left', (vis.config.tooltipPadding) + 'px')   
-                    .style('top', (vis.config.tooltipPadding) + 'px')
+                    .style('left', (svgPosition.offsetLeft + vis.config.tooltipPadding) + 'px')   
+                    .style('top', (svgPosition.offsetTop + vis.config.tooltipPadding) + 'px')
                     .html(`
                         <div class='tooltip-title'>${d.id}</div>
                         <div>Interacts with:</div>
