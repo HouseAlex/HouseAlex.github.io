@@ -31,16 +31,56 @@ d3.csv('data/Supernatural.csv')
     }, mainCastDialogue)
     characterNetwork.UpdateVis()
 
+    // Season Selector updating NetworkGraph and BarChart
     d3.select('#seasonSelector')
         .on('change', function() {
             if (this.value == 0){
                 characterNetwork.data = mainCastDialogueOG
                 characterNetwork.UpdateVis();
+                barchart.data = mainCastDialogueOG
+                barchart.UpdateVis();
             }
             else {
                 let filtered = mainCastDialogue.filter(d => d.season == this.value)
                 characterNetwork.data = filtered
                 characterNetwork.UpdateVis();
+                barchart.data = filtered
+                barchart.UpdateVis();
             }
         })
+
+    barchart = new BarChart({
+        parentElement: '#barchart',
+        parameter: 'speaker',
+        title: 'Line Count by Speaker',
+        xTitle: 'Speaker Name'
+    }, mainCastDialogue);
+    barchart.UpdateVis();
+
+
+
+    speakerSelector = d3.select('#speakerSelector')
+        .selectAll('option')
+        .data(mainCast)
+        .enter().append('option')
+        .attr('value', d => d)
+        .text(d => d)
+
+    // Season Selector updating NetworkGraph and BarChart
+    d3.select('#speakerSelector')
+        .on('change', function() {
+                let filtered = mainCastDialogue.filter(d => d.speaker == this.value)
+                barchart2.data = filtered
+                barchart2.UpdateVis();
+        })
+
+
+    barchart2 = new BarChart({
+        parentElement: '#barchart2',
+        parameter: 'episodeNum',
+        title: 'Line Count by Episode Number per Selected Speaker',
+        xTitle: 'Episode Number'
+    }, mainCastDialogue);
+    barchart.UpdateVis();
+
 })
