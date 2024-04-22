@@ -15,9 +15,6 @@ class NetworkGraph {
     InitVis() {
         let vis = this;
 
-        vis.ProcessData();
-
-        console.log(vis.links)
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
@@ -36,13 +33,48 @@ class NetworkGraph {
                 vis.chart.attr("transform", transform)
             });
 
-        vis.svg.call(vis.zoom);
+        vis.svg.call(vis.zoom);        
+
+        vis.frequencyScale = d3.scaleLinear()
+            .range([0.05,1]);
+        
+        vis.ProcessData();
+        console.log(vis.links)
+
+        vis.RenderVis();
     }
 
     UpdateVis() {
         let vis = this;
+        
+        vis.ProcessData();
+        //console.log(vis.links)
 
-        vis.RenderVis();
+        vis.link = vis.chart.selectAll(".link")
+            .data(vis.links)
+
+        vis.link.join("line")
+            .attr("class", "link")
+            .merge(vis.link)
+            .style("stroke-width", d => vis.frequencyScale(d.freq) * 8)
+            .exit().remove();
+        
+        // Update nodes
+        vis.node = vis.chart.selectAll(".node")
+            .data(vis.nodes);
+        
+        vis.node.join("circle")
+            .attr("class", "node")
+            .merge(vis.node)
+            .exit().remove();
+
+        console.log(vis.node)
+        console.log(vis.link)
+        
+        // Restart simulation
+        vis.simulation.nodes(vis.nodes);
+        vis.simulation.force("link").links(vis.links);
+        vis.simulation.alpha(1).restart();
     }
 
     RenderVis() {
@@ -75,7 +107,7 @@ class NetworkGraph {
             .data(vis.links)
             .enter().append("line")
             .attr("class", "link")
-            .style("stroke-width", d => d.strength * 8)
+            .style("stroke-width", d => vis.frequencyScale(d.freq) * 8)
             .style("stroke", "black");
 
         vis.node = vis.chart.selectAll(".node")
@@ -176,10 +208,6 @@ class NetworkGraph {
 
         });
 
-        
-        let maxFrequency = d3.max(vis.links, d => d.freq);
-        vis.links.forEach(link => {
-            link.strength = link.freq / maxFrequency; // Normalize to [0, 1] range
-        });
+        vis.frequencyScale.domain(d3.extent(vis.links, d=> d.freq))
     }
 }
