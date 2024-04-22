@@ -275,7 +275,7 @@ class WordCloud {
     // Iterate over each entry in the data
         data.forEach(entry => {
             // Extract the description and split it into words
-            const descriptionWords = entry.description.split(/\s+/);
+            const descriptionWords = entry.line.split(/\s+/);
             
             // Iterate over each word in the description
             descriptionWords.forEach(word => {
