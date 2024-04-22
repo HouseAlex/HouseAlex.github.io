@@ -29,6 +29,7 @@ d3.csv('data/Supernatural.csv')
     characterNetwork = new NetworkGraph({
         parentElement: '#characterNetwork'
     }, mainCastDialogue)
+    characterNetwork.UpdateVis()
 
     d3.select('#seasonSelector')
         .on('change', function() {

@@ -41,40 +41,16 @@ class NetworkGraph {
         vis.ProcessData();
         console.log(vis.links)
 
-        vis.RenderVis();
+        
     }
 
     UpdateVis() {
         let vis = this;
         
         vis.ProcessData();
-        //console.log(vis.links)
+        console.log(vis.links)
 
-        vis.link = vis.chart.selectAll(".link")
-            .data(vis.links)
-
-        vis.link.join("line")
-            .attr("class", "link")
-            .merge(vis.link)
-            .style("stroke-width", d => vis.frequencyScale(d.freq) * 8)
-            .exit().remove();
-        
-        // Update nodes
-        vis.node = vis.chart.selectAll(".node")
-            .data(vis.nodes);
-        
-        vis.node.join("circle")
-            .attr("class", "node")
-            .merge(vis.node)
-            .exit().remove();
-
-        console.log(vis.node)
-        console.log(vis.link)
-        
-        // Restart simulation
-        vis.simulation.nodes(vis.nodes);
-        vis.simulation.force("link").links(vis.links);
-        vis.simulation.alpha(1).restart();
+        vis.RenderVis()
     }
 
     RenderVis() {
@@ -102,17 +78,20 @@ class NetworkGraph {
                 d.fx = null;
                 d.fy = null;
             })
+
+        vis.chart.selectAll(".link").remove();
+        vis.chart.selectAll(".node").remove();
         
         vis.link = vis.chart.selectAll(".link")
             .data(vis.links)
-            .enter().append("line")
+            .join("line")
             .attr("class", "link")
             .style("stroke-width", d => vis.frequencyScale(d.freq) * 8)
             .style("stroke", "black");
 
         vis.node = vis.chart.selectAll(".node")
             .data(vis.nodes)
-            .enter().append("circle")
+            .join("circle")
             .attr("class", "node")
             .attr("r", 8)
             .style("fill", "red")
@@ -166,6 +145,10 @@ class NetworkGraph {
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
         });
+
+        vis.simulation.nodes(vis.nodes);
+        vis.simulation.force("link").links(vis.links);
+        vis.simulation.alpha(1).restart();
     }
 
     ProcessData() {
