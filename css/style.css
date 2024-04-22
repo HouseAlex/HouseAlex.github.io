@@ -90,3 +90,16 @@
     display: grid;
     grid-template-columns: 3fr 3fr;
 }
+
+
+
+.control-sticky {
+    background-color: white;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    position:relative;
+    border-radius: 5px;
+}
