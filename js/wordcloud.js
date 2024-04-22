@@ -8,28 +8,28 @@ class WordCloud {
 
     initVis() {
 
-        function isColliding(rect1, rect2) {
-            return !(rect1.x + rect1.width < rect2.x || 
-                     rect1.x > rect2.x + rect2.width || 
-                     rect1.y + rect1.height < rect2.y || 
-                     rect1.y > rect2.y + rect2.height);
-        }
+        // function isColliding(rect1, rect2) {
+        //     return !(rect1.x + rect1.width < rect2.x || 
+        //              rect1.x > rect2.x + rect2.width || 
+        //              rect1.y + rect1.height < rect2.y || 
+        //              rect1.y > rect2.y + rect2.height);
+        // }
 
         // function adjustPosition(wordRect, existingRects) {
         //     let collisionDetected = false;
         //     let newX = wordRect.x;
         //     let newY = wordRect.y;
     
-        //     // Check for collisions with existing words
-        //     existingRects.forEach(existingRect => {
-        //         if (isColliding(wordRect, existingRect)) {
-        //             collisionDetected = true;
-        //             // Adjust the position of the word (e.g., move it vertically)
-        //             newY += wordRect.height + vis.config.minFontSize;
-        //         }
-        //     });
+            // Check for collisions with existing words
+            // existingRects.forEach(existingRect => {
+            //     if (isColliding(wordRect, existingRect)) {
+            //         collisionDetected = true;
+            //         // Adjust the position of the word (e.g., move it vertically)
+            //         newY += wordRect.height + vis.config.minFontSize;
+            //     }
+            // });
     
-        //     // If collision detected, recursively adjust position until no collision
+            // If collision detected, recursively adjust position until no collision
         //     if (collisionDetected) {
         //         return adjustPosition({ x: newX, y: newY, width: wordRect.width, height: wordRect.height }, existingRects);
         //     } else {
@@ -41,15 +41,23 @@ class WordCloud {
         const stopWords = [""];
 
         vis.config.margin = {top: 20, right: 20, bottom: 20, left: 20};
-        vis.config.width = 600;
-        vis.config.height = 300;
+        vis.config.width = 800;
+        vis.config.height = 500;
         vis.config.minFontSize = 10;
         vis.config.maxFontSize = 50;
         vis.config.textColor = "#000";
         vis.config.hoverColor = "#ff0";
 
+        // d3.select(vis.config.parentElement).select("svg").remove();
+
         const containerWidth = vis.config.width - vis.config.margin.left - vis.config.margin.right;
         const containerHeight = vis.config.height - vis.config.margin.top - vis.config.margin.bottom;
+
+        const maxX = containerWidth - vis.config.maxFontSize;
+        const maxY = containerHeight - vis.config.maxFontSize;
+
+        const minX = vis.config.margin.left;
+        const minY = vis.config.margin.top + vis.config.minFontSize;
 
         const wordPositions = [];
 
@@ -58,8 +66,12 @@ class WordCloud {
         //console.log("word count", new_data.size)
         //console.log("new_data", new_data);
 
-        const topWords = this.getTopWords(new_data, 60);
+        const topWords = this.getTopWords(new_data, 50);
         //console.log("topWords", topWords);
+
+        vis.fontSizeScale = d3.scaleLinear()
+            .domain([0, d3.max(Object.values(topWords))])
+            .range([vis.config.minFontSize, vis.config.maxFontSize]);
 
 
         // Set up SVG container
@@ -79,77 +91,109 @@ class WordCloud {
             //.style("stroke", "black")
             //.style("stroke-width", 2);
 
-        // Create scales
-        vis.fontSizeScale = d3.scaleLinear()
-            .domain([0, d3.max(Object.values(topWords))])
-            .range([vis.config.minFontSize, vis.config.maxFontSize]);
+        const simulation = d3.forceSimulation()
+            .force("center", d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
+            .force("charge", d3.forceManyBody().strength(-20))
+            .force("collide", d3.forceCollide().radius(d => d.radius + 2).strength(1))
+            .stop();
+
+        const wordNodes = Object.entries(topWords).map(([word, frequency]) => {
+            const fontSize = vis.fontSizeScale(frequency);
+            return { word, frequency, radius: fontSize / 2 };
+        });
+
+        simulation.nodes(wordNodes);
+
+        for (let i = 0; i < 300; i++) {
+            simulation.tick();
+        }
 
         const colorScale = d3.scaleLinear()
             .domain([3, d3.max(Object.values(topWords))])
             .range(["blue", "red"]);
 
-        // Create words
         vis.words = vis.svg.selectAll("text")
-            .data(Object.entries(topWords))
+            .data(wordNodes)
             .enter()
             .append("text")
-            .text(d => d[0])
-            .attr("font-size", d => vis.fontSizeScale(d[1]))
-            .attr("fill", d => colorScale(d[1]))
-            .attr("x", d => Math.random() * vis.config.width)
-            .attr("y", d => Math.random() * vis.config.height)
+            .text(d => d.word)
+            .attr("font-size", d => vis.fontSizeScale(d.frequency))
+            .attr("fill", d => colorScale(d.frequency))
+            .attr("x", d => Math.max(d.radius, Math.min(vis.config.width - d.radius, d.x)))
+            .attr("y", d => Math.max(d.radius, Math.min(vis.config.height - d.radius, d.y)))
+            .attr("text-anchor", "middle");
 
-        vis.words.each(function(d, i) {
+        words.each(function (d) {
             const wordElement = d3.select(this);
-            const fontSize = parseFloat(wordElement.attr("font-size"));
-            const wordWidth = this.getBBox().width;
-            const wordHeight = this.getBBox().height;
+            wordElement.attr("transform", `translate(${d.x},${d.y})`); // Adjust word positions
+        });
 
-            // Randomly position the word within the SVG container
-            let x = Math.random() * (containerWidth - wordWidth);
-            let y = Math.random() * (containerHeight - wordHeight);
 
-            const wordBBox = this.getBBox();
-            let wordRect = {
-                x: parseFloat(wordElement.attr("x")),
-                y: parseFloat(wordElement.attr("y")),
-                width: wordBBox.width,
-                height: wordBBox.height
-            };
+        // Create scales
+
+
+        // // Create words
+        // vis.words = vis.svg.selectAll("text")
+        //     .data(Object.entries(topWords))
+        //     .enter()
+        //     .append("text")
+        //     .text(d => d[0])
+        //     .attr("font-size", d => vis.fontSizeScale(d[1]))
+        //     .attr("fill", d => colorScale(d[1]))
+        //     .attr("x", d => Math.random() * vis.config.width)
+        //     .attr("y", d => Math.random() * vis.config.height)
+
+        // vis.words.each(function(d, i) {
+        //     const wordElement = d3.select(this);
+        //     const fontSize = parseFloat(wordElement.attr("font-size"));
+        //     const wordWidth = this.getBBox().width;
+        //     const wordHeight = this.getBBox().height;
+
+        //     // Randomly position the word within the SVG container
+        //     let x = Math.random() * (containerWidth - wordWidth);
+        //     let y = Math.random() * (containerHeight - wordHeight);
+
+        //     const wordBBox = this.getBBox();
+        //     let wordRect = {
+        //         x: parseFloat(wordElement.attr("x")),
+        //         y: parseFloat(wordElement.attr("y")),
+        //         width: wordBBox.width,
+        //         height: wordBBox.height
+        //     };
 
             // Check for collisions with previously positioned words
-            let collision = true;
-            // while (collision) {
-            //     collision = false;
-            //     // Iterate over existing word positions
-            //     for (const position of wordPositions) {
-            //         const distance = Math.sqrt(Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2));
-            //         // Check the distance between the current position and existing positions
-            //         if (distance < ((fontSize + position.fontSize) * 1.25)) {
-            //             collision = true;
-            //             // Adjust the position
-            //             x = Math.random() * (containerWidth - wordWidth);
-            //             y = Math.random() * (containerHeight - wordHeight);
-            //             break;
-            //         }
-            //     }
-            // }
+        //     let collision = true;
+        //     while (collision) {
+        //         collision = false;
+        //         // Iterate over existing word positions
+        //         for (const position of wordPositions) {
+        //             const distance = Math.sqrt(Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2));
+        //             // Check the distance between the current position and existing positions
+        //             if (distance < ((fontSize + position.fontSize) * .75)) {
+        //                 collision = true;
+        //                 // Adjust the position
+        //                 x = Math.random() * (containerWidth - wordWidth);
+        //                 y = Math.random() * (containerHeight - wordHeight);
+        //                 break;
+        //             }
+        //         }
+        //     }
 
-            // Store the position and font size of the word
-            wordPositions.push({ x, y, fontSize });
+        //     // Store the position and font size of the word
+        //     wordPositions.push({ x, y, fontSize });
 
-            // Set the position of the word element
-            wordElement.attr("x", x + 10)
-                    .attr("y", y + 30);
+        //     // Set the position of the word element
+        //     wordElement.attr("x", x + 10)
+        //             .attr("y", y + 30);
 
-            // Adjust positions to ensure words remain within the SVG container boundaries
-            // wordRect.x = Math.max(minX, Math.min(wordRect.x, maxX));
-            // wordRect.y = Math.max(minY, Math.min(wordRect.y, maxY));
+        //     // Adjust positions to ensure words remain within the SVG container boundaries
+        //     wordRect.x = Math.max(minX, Math.min(wordRect.x, maxX));
+        //     wordRect.y = Math.max(minY, Math.min(wordRect.y, maxY));
 
-            // // Update the position of the word element
-            // wordElement.attr("x", wordRect.x)
-            //         .attr("y", wordRect.y);
-        });
+        //     // Update the position of the word element
+        //     wordElement.attr("x", wordRect.x)
+        //             .attr("y", wordRect.y);
+        // });
 
         // Define brushing
         // vis.brush = d3.brush()
