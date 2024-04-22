@@ -15,8 +15,6 @@ class NetworkGraph {
     InitVis() {
         let vis = this;
 
-        vis.ProcessData();
-
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
@@ -35,13 +33,24 @@ class NetworkGraph {
                 vis.chart.attr("transform", transform)
             });
 
-        vis.svg.call(vis.zoom);
+        vis.svg.call(vis.zoom);        
+
+        vis.frequencyScale = d3.scaleLinear()
+            .range([0.05,1]);
+        
+        vis.ProcessData();
+        console.log(vis.links)
+
+        
     }
 
     UpdateVis() {
         let vis = this;
+        
+        vis.ProcessData();
+        console.log(vis.links)
 
-        vis.RenderVis();
+        vis.RenderVis()
     }
 
     RenderVis() {
@@ -69,16 +78,20 @@ class NetworkGraph {
                 d.fx = null;
                 d.fy = null;
             })
+
+        vis.chart.selectAll(".link").remove();
+        vis.chart.selectAll(".node").remove();
         
         vis.link = vis.chart.selectAll(".link")
             .data(vis.links)
-            .enter().append("line")
+            .join("line")
             .attr("class", "link")
+            .style("stroke-width", d => vis.frequencyScale(d.freq) * 8)
             .style("stroke", "black");
 
         vis.node = vis.chart.selectAll(".node")
             .data(vis.nodes)
-            .enter().append("circle")
+            .join("circle")
             .attr("class", "node")
             .attr("r", 8)
             .style("fill", "red")
@@ -132,6 +145,10 @@ class NetworkGraph {
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
         });
+
+        vis.simulation.nodes(vis.nodes);
+        vis.simulation.force("link").links(vis.links);
+        vis.simulation.alpha(1).restart();
     }
 
     ProcessData() {
@@ -151,23 +168,29 @@ class NetworkGraph {
                     vis.nodes.push({ id: character });
                 }
             });
-    
+            
+            let interactions = {};
+            
             // Create links between characters in the scene
             for (let i = 0; i < characters.length - 1; i++) {
                 for (let j = i + 1; j < characters.length; j++) {
                     let source = characters[i];
                     let target = characters[j];
     
-                    // Check if link already exists
-                    let existingLink = vis.links.find(link => (link.source === source && link.target === target) || (link.source === target && link.target === source));
-    
-                    if (existingLink) {
-                        existingLink.value++;
-                    } else {
-                        vis.links.push({ source, target, value: 1 });
-                    }
+                    let interactionKey = source < target ? source + '-' + target : target + '-' + source;
+
+                    // Increment interaction count
+                    interactions[interactionKey] = (interactions[interactionKey] || 0) + 1;
                 }
             }
+
+            Object.entries(interactions).forEach(([interactionKey, frequency]) => {
+                let [source, target] = interactionKey.split('-');
+                vis.links.push({ source, target, freq: frequency });
+            });
+
         });
+
+        vis.frequencyScale.domain(d3.extent(vis.links, d=> d.freq))
     }
 }
