@@ -119,21 +119,21 @@ class WordCloud {
 
             // Check for collisions with previously positioned words
             let collision = true;
-            while (collision) {
-                collision = false;
-                // Iterate over existing word positions
-                for (const position of wordPositions) {
-                    const distance = Math.sqrt(Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2));
-                    // Check the distance between the current position and existing positions
-                    if (distance < ((fontSize + position.fontSize) * 1.25)) {
-                        collision = true;
-                        // Adjust the position
-                        x = Math.random() * (containerWidth - wordWidth);
-                        y = Math.random() * (containerHeight - wordHeight);
-                        break;
-                    }
-                }
-            }
+            // while (collision) {
+            //     collision = false;
+            //     // Iterate over existing word positions
+            //     for (const position of wordPositions) {
+            //         const distance = Math.sqrt(Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2));
+            //         // Check the distance between the current position and existing positions
+            //         if (distance < ((fontSize + position.fontSize) * 1.25)) {
+            //             collision = true;
+            //             // Adjust the position
+            //             x = Math.random() * (containerWidth - wordWidth);
+            //             y = Math.random() * (containerHeight - wordHeight);
+            //             break;
+            //         }
+            //     }
+            // }
 
             // Store the position and font size of the word
             wordPositions.push({ x, y, fontSize });
@@ -152,30 +152,30 @@ class WordCloud {
         });
 
         // Define brushing
-        vis.brush = d3.brush()
-            .extent([[0, 0], [vis.config.width, vis.config.height]])
-            .on("end", function(event) {
-                const selection = event.selection;
-                if (!selection) {
-                    vis.dispatcher.call("reset", vis.event, vis.config.parentElement);
-                    return;
-                }
-                const [[x0, y0], [x1, y1]] = event.selection;
-                vis.words.each(function(d) {
-                    const x = parseFloat(d3.select(this).attr("x"));
-                    const y = parseFloat(d3.select(this).attr("y"));
-                    const selected = x >= x0 && x <= x1 && y >= y0 && y <= y1;
-                    d3.select(this).classed("selected", selected);
-                });
-                const selectedWords = vis.words.filter(".selected").data().map(d => d[0]);
-                // console.log("selectedWords", selectedWords);
-                vis.dispatcher.call("cloudFilter", vis.event, selectedWords);
-            });
+        // vis.brush = d3.brush()
+        //     .extent([[0, 0], [vis.config.width, vis.config.height]])
+        //     .on("end", function(event) {
+        //         const selection = event.selection;
+        //         if (!selection) {
+        //             vis.dispatcher.call("reset", vis.event, vis.config.parentElement);
+        //             return;
+        //         }
+        //         const [[x0, y0], [x1, y1]] = event.selection;
+        //         vis.words.each(function(d) {
+        //             const x = parseFloat(d3.select(this).attr("x"));
+        //             const y = parseFloat(d3.select(this).attr("y"));
+        //             const selected = x >= x0 && x <= x1 && y >= y0 && y <= y1;
+        //             d3.select(this).classed("selected", selected);
+        //         });
+        //         const selectedWords = vis.words.filter(".selected").data().map(d => d[0]);
+        //         // console.log("selectedWords", selectedWords);
+        //         vis.dispatcher.call("cloudFilter", vis.event, selectedWords);
+        //     });
 
         // Append brush to SVG
-        vis.svg.append("g")
-            .attr("class", "brush")
-            .call(vis.brush);
+        // vis.svg.append("g")
+        //     .attr("class", "brush")
+        //     .call(vis.brush);
     }
 
     fixTypos(word) {
