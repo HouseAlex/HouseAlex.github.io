@@ -30,8 +30,8 @@
                 <p>Sam Winchester</p>
             </div>
         </div>
-        <div class="control">
-            <div class="container-grid" style="margin-right: 10px;">
+        <div class="control-sticky" id="stickyDiv">
+            <div class="container-grid" style="margin: 10px;">
                 <label style="margin-bottom:5px;">Season Selector</label>
                 <select id="seasonSelector" style="margin-top: 0px; margin-right: 10px; height: 25px;"></select>
             </div>
@@ -61,6 +61,34 @@
     <script src="js/barchart.js"></script>
     <script src="js/networkgraph.js"></script>
     <script src="js/wordcloud.js"></script>
+    <script>
+        stickyElem = document.querySelector(".control-sticky");
+ 
+        /* Gets the amount of height
+        of the element from the
+        viewport and adds the
+        pageYOffset to get the height
+        relative to the page */
+        currStickyPos = stickyElem.getBoundingClientRect().top 
+          + window.pageYOffset;
+        window.onscroll = function () {
+ 
+            /* Check if the current Y offset
+            is greater than the position of
+            the element */
+            if (window.pageYOffset > currStickyPos) {
+            stickyElem.style.position = "fixed";
+            stickyElem.style.top = "0";
+            stickyElem.style.left = "50%"; // Center the fixed element horizontally
+            stickyElem.style.transform = "translateX(-50%)"; // Adjust for the width of the element
+        } else {
+            stickyElem.style.position = "relative";
+            stickyElem.style.top = "initial";
+            stickyElem.style.left = "initial"; // Reset the left position when not fixed
+            stickyElem.style.transform = "none"; // Reset the transform
+        }
+        }
+    </script>
 </body>
 
 </html>

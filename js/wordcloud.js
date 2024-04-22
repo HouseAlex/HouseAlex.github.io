@@ -122,10 +122,10 @@ class WordCloud {
             .attr("text-anchor", "middle")
             .style("font-family", "fantasy, sans-serif");
 
-        words.each(function (d) {
-            const wordElement = d3.select(this);
-            wordElement.attr("transform", `translate(${d.x},${d.y})`); // Adjust word positions
-        });
+        //vis.words.each(function (d) {
+        //    const wordElement = d3.select(this);
+        //    wordElement.attr("transform", `translate(${d.x},${d.y})`); // Adjust word positions
+        //});
     }
 
     fixTypos(word) {
