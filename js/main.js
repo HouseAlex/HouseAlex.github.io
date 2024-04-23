@@ -187,6 +187,8 @@ d3.csv('data/Supernatural.csv')
                 wordcloud.data = filtered
                 phrases.data = filtered
                 barchart2.UpdateVis();
+                wordcloud.UpdateVis();
+                phrases.UpdateVis();
         })
 
     d3.select('#episodeSelector')
