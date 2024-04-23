@@ -2,9 +2,10 @@ class LineChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 800,
-            containerHeight: _config.containerHeight || 600,
+            containerWidth: _config.containerWidth || 1200,
+            containerHeight: _config.containerHeight || 400,
             margin: _config.margin || {top: 45, right: 25, bottom: 40, left: 50},
+            legend: _config.legend || 100,
             tooltipPadding: _config.tooltipPadding || 15,
             title: _config.title,
         }
@@ -15,7 +16,7 @@ class LineChart {
     InitVis() {
         let vis = this;
 
-        vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
+        vis.width = vis.config.containerWidth - vis.config.margin.left -  vis.config.legend -vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
         vis.svg = d3.select(vis.config.parentElement).append("svg")
@@ -36,11 +37,12 @@ class LineChart {
 
         vis.xAxis = vis.chart.append("g")
             .attr("transform", "translate(0 +" + vis.height + ")")
-            .call(d3.axisBottom(vis.xScale))
+            .call(d3.axisBottom(vis.xScale)
+                    .tickSize(0)
+                    .tickFormat(""))
 
         vis.yAxis = vis.chart.append("g")
             //.attr("transform", `translate(${vis.config.margin.left},0)`)
-            .call(d3.axisLeft(vis.yScale).ticks(vis.height / 80))
             .call(g => g.select(".domain").remove())
             .call(g => g.selectAll(".tick line").clone()
                 .attr("x2", vis.width)
@@ -51,7 +53,7 @@ class LineChart {
                 .attr("fill", "currentColor")
                 .attr("text-anchor", "start"));
 
-        vis.clip = vis.chart.append("defs").append("svg:clipPath")
+        /*vis.clip = vis.chart.append("defs").append("svg:clipPath")
             .attr("id", "clip")
             .append("svg:rect")
             .attr("width", vis.width )
@@ -66,7 +68,13 @@ class LineChart {
             .x(function(d) { return vis.xScale(d.data.chunk); })
             //.x(function(d) { return vis.xScale(d.data[0]); })
             .y0(function(d) { return vis.yScale(d[0]); })
-            .y1(function(d) { return vis.yScale(d[1]); })
+            .y1(function(d) { return vis.yScale(d[1]); })*/
+
+        vis.line = d3.line()
+            .x(function(d) { return vis.xScale(d.chunk)})
+            .y(function(d) { return vis.yScale(d.density)})
+
+        
     
 
 
@@ -81,13 +89,129 @@ class LineChart {
         let vis = this;
 
         vis.ProcessData();
-        vis.sumstat = d3.nest()
-            .key(d => d.speaker)
-            .entries(vis.chunkDensities)
+        vis.sumstat = d3.group(vis.chunkDensities, d=> d.speaker);
+        console.log(vis.sumstat)
 
         vis.yScale.domain([0, d3.max(vis.chunkDensities, d => d.density)])
-        vis.color.domain(vis.sumstat.map(d => d.key))
-        /*vis.series = d3.stack()
+        vis.yAxis
+            .call(d3.axisLeft(vis.yScale).ticks(vis.height / 80))
+        vis.keys = Array.from(vis.sumstat.keys())
+        console.log(vis.keys)
+        vis.color.domain(vis.keys)
+        
+
+        vis.RenderVis()
+    }
+
+    RenderVis() {
+        let vis = this;
+
+        vis.chart.selectAll('.characterLines').remove()
+
+        vis.lines = vis.chart.selectAll('.line')
+            .data(vis.sumstat)
+            .enter().append('path')
+            .attr('class', 'characterLines')
+            .attr("fill", "none")
+            .attr("stroke", function(d){ return vis.color(d[0]) })
+            .attr("stroke-width", 3)
+            .attr("d", d => vis.line(d[1]))
+
+        vis.lines.exit().remove();
+
+        vis.svg.selectAll('.legend').remove()
+
+        vis.legend = vis.svg.append("g")
+            .attr("class", "legend")
+            .attr("transform", `translate(${vis.width + vis.config.margin.left + 10}, 20)`);
+
+        vis.legendItems = vis.legend.selectAll(".legend-item")
+            .data(vis.keys)
+            .enter().append("g")
+            .attr("class", "legend-item")
+            .attr("transform", (d, i) => `translate(0, ${i * 20})`);
+
+        vis.legendItems.append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", d => vis.color(d));
+        
+        vis.legendItems.append("text")
+            .attr("x", 15)
+            .attr("y", 8)
+            .attr("dy", "0.35em")
+            .text(d => d);
+
+        /*vis.legendItems
+            .on("mouseover", function(d,val) {
+                console.log(val)
+                vis.chart.selectAll('path')
+                    .filter(line => line !== val)
+                    .transition()
+                    .style("opacity", 0.3)
+            })
+            .on("mouseout", function() {
+                // Restore opacity for all lines
+                vis.chart.selectAll("path")
+                    .transition()
+                    .style("opacity", 1);
+            });*/
+    }
+
+    ProcessData() {
+        let vis = this;
+        vis.chunkDensities = [];
+        let totalLines = vis.data.length;
+        let linesPerChunk = Math.ceil(totalLines / vis.numChunks);
+        vis.allSpeakers = Array.from(new Set(vis.data.map(d => d.speaker)));
+
+        for (let i = 0; i < vis.numChunks; i++) {
+            let chunkLines = vis.data.slice(i * linesPerChunk, (i + 1) * linesPerChunk);
+            let speakersInChunk = new Set(chunkLines.map(line => line.speaker));
+
+            speakersInChunk.forEach(speaker => {
+                let density = chunkLines.filter(line => line.speaker === speaker).length;
+                vis.chunkDensities.push({ chunk: i, speaker, density });
+            });
+
+            // Fill in missing speakers with 0 density
+            vis.allSpeakers.forEach(speaker => {
+                if (!speakersInChunk.has(speaker)) {
+                    vis.chunkDensities.push({ chunk: i, speaker, density: 0 });
+                }
+            });
+        }
+        
+        //transform data
+        /*
+        const groupedData = d3.group(vis.chunkDensities, d=> d.chunk);
+
+        vis.transformedData = []
+
+        groupedData.forEach((chunkData, chunk) => {
+            const chunkObj = { chunk };
+    
+            // For each speaker, add their density to the chunk object
+            vis.allSpeakers.forEach(speaker => {
+                const density = chunkData.find(d => d.speaker === speaker)?.density || 0;
+                chunkObj[`${speaker}Density`] = density;
+            });
+    
+            vis.transformedData.push(chunkObj);
+        });
+
+        console.log(vis.transformedData)*/
+    }
+}
+
+
+
+/*
+
+UPDATE VIS STACKED LINE CODE
+vis.series = d3.stack()
             .keys(d3.union(vis.chunkDensities.map(d => d.speaker)))
             .value(([, D], key) => D.get(key).density)
             (d3.index(vis.chunkDensities, d => d.chunk, d => d.speaker))
@@ -111,26 +235,10 @@ class LineChart {
 
         vis.color.domain(vis.keys)
 
-        console.log(vis.stackedData)*/
+        console.log(vis.stackedData)
 
-        vis.RenderVis()
-    }
+RENDER VIS STACKED LINE CODE
 
-    RenderVis() {
-        let vis = this;
-
-        vis.lines = vis.chart.selectAll('.line')
-            .data(vis.sumstat)
-            .enter().append('path')
-            .attr("fill", "none")
-            .attr("stroke", function(d){ return color(d.key) })
-            .attr("stroke-width", 1.5)
-            .attr("d", function(d){
-                return d3.line()
-                    .x(function(d) { return vis.xScale(d.chunk); })
-                    .y(function(d) { return vis.yScale(+d.density); })
-                    (d.values)
-        })
             
 
         /*vis.paths = vis.chart.append("g")
@@ -191,50 +299,4 @@ class LineChart {
                     
                     d3.selectAll(".myArea").style("opacity", 1)
                 })*/
-    }
-
-    ProcessData() {
-        let vis = this;
-        vis.chunkDensities = [];
-        let totalLines = vis.data.length;
-        let linesPerChunk = Math.ceil(totalLines / vis.numChunks);
-        vis.allSpeakers = Array.from(new Set(vis.data.map(d => d.speaker)));
-
-        for (let i = 0; i < vis.numChunks; i++) {
-            let chunkLines = vis.data.slice(i * linesPerChunk, (i + 1) * linesPerChunk);
-            let speakersInChunk = new Set(chunkLines.map(line => line.speaker));
-
-            speakersInChunk.forEach(speaker => {
-                let density = chunkLines.filter(line => line.speaker === speaker).length;
-                vis.chunkDensities.push({ chunk: i, speaker, density });
-            });
-
-            // Fill in missing speakers with 0 density
-            vis.allSpeakers.forEach(speaker => {
-                if (!speakersInChunk.has(speaker)) {
-                    vis.chunkDensities.push({ chunk: i, speaker, density: 0 });
-                }
-            });
-        }
-        
-        //transform data
-        /*
-        const groupedData = d3.group(vis.chunkDensities, d=> d.chunk);
-
-        vis.transformedData = []
-
-        groupedData.forEach((chunkData, chunk) => {
-            const chunkObj = { chunk };
-    
-            // For each speaker, add their density to the chunk object
-            vis.allSpeakers.forEach(speaker => {
-                const density = chunkData.find(d => d.speaker === speaker)?.density || 0;
-                chunkObj[`${speaker}Density`] = density;
-            });
-    
-            vis.transformedData.push(chunkObj);
-        });
-
-        console.log(vis.transformedData)*/
-    }
-}
+                

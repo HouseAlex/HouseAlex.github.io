@@ -1,4 +1,4 @@
-let characterNetwork
+let characterNetwork, episodeSelector
 
 let mainCast = ['DEAN','SAM','CASTIEL','LUCIFER','CROWLEY','RUBY','BELA','JACK','MARY','JOHN','BOBBY','MEG','CHUCK','GABRIEL','ROWENA','GOD','JODY','CHARLIE']
 
@@ -24,7 +24,8 @@ d3.csv('data/Supernatural.csv')
     seasonSelector = d3.select('#seasonSelector')
         .selectAll('option')
         .data(seasonDropDown)
-        .join('option')
+        .enter().append('option')
+        .attr('class', 'season')
         .attr('value', d => d.value)
         .text(d => d.season)
 
@@ -32,6 +33,7 @@ d3.csv('data/Supernatural.csv')
         .selectAll('option')
         .data(mainCast)
         .enter().append('option')
+        .attr('class', 'speaker')
         .attr('value', d => d)
         .text(d => d)
 
@@ -44,6 +46,17 @@ d3.csv('data/Supernatural.csv')
     }
     mainCastDialogueOG = [...mainCastDialogue]
     console.log("Main Character Data:", mainCastDialogue)
+
+    
+    seasonEps = mainCastDialogue.filter(d => d.season == 1).map(d => +d.episodeNum)
+    seasonEps = seasonEps.filter((val, i) => seasonEps.indexOf(val) === i)
+    episodeSelector = d3.select('#episodeSelector')
+        .selectAll('option')
+        .data(seasonEps)
+        .enter().append('option')
+        .attr('class', 'episodeNums')
+        .attr('value', d => d)
+        .text(d => d)
 
     characterNetwork = new NetworkGraph({
         parentElement: '#characterNetwork'
@@ -86,13 +99,13 @@ d3.csv('data/Supernatural.csv')
         .on('change', function() {
             if (this.value == 0){
                 characterNetwork.data = mainCastDialogueOG //! COMMENTed CODE FOR DDL FILTERING - NOT WORKING
-                /*
-                console.log(mainCast)
-                speakerSelector.selectAll("option").remove();
-                speakerSelector
+                d3.select('#speakerSelector').selectAll('.speaker').remove()
+                d3.select('#speakerSelector').selectAll("option")
                     .data(mainCast)
                     .enter().append("option")
-                    .text(d => d);*/
+                    .attr('class', 'speaker')
+                    .attr('value', d => d)
+                    .text(d => d);
                 characterNetwork.UpdateVis();
                 barchart.data = mainCastDialogueOG
                 barchart.UpdateVis();
@@ -103,19 +116,28 @@ d3.csv('data/Supernatural.csv')
                 }
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+                
+                seasonEps = mainCastDialogue.filter(d => d.season == 1).map(d => +d.episodeNum)
+                seasonEps = seasonEps.filter((val, i) => seasonEps.indexOf(val) === i)
+                d3.select('#episodeSelector').selectAll('.episodeNums').remove()
+                d3.select('#episodeSelector').selectAll("option")
+                    .data(seasonEps)
+                    .enter().append('option')
+                    .attr('class', 'episodeNums')
+                    .attr('value', d => d)
+                    .text(d => d)
             }
             else {
-                let filtered = mainCastDialogue.filter(d => d.season == this.value)/*
+                let filtered = mainCastDialogue.filter(d => d.season == this.value)
                 characters = filtered.map(d => d.speaker)
                 seasonCharacters = characters.filter((val, i) => characters.indexOf(val) === i)
-                console.log(seasonCharacters)
-                speakerSelector
+                d3.select('#speakerSelector').selectAll('.speaker').remove()
+                d3.select('#speakerSelector').selectAll("option")
                     .data(seasonCharacters)
-                speakerSelector.exit().remove()
-                speakerSelector
                     .enter().append("option")
-                    .merge(speakerSelector)
-                    .text(d => d);*/
+                    .attr('class', 'speaker')
+                    .attr('value', d => d)
+                    .text(d => d);
 
                 characterNetwork.data = filtered
                 characterNetwork.UpdateVis();
@@ -127,6 +149,16 @@ d3.csv('data/Supernatural.csv')
                 }
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+
+                seasonEps = mainCastDialogue.filter(d => d.season == this.value).map(d => +d.episodeNum)
+                seasonEps = seasonEps.filter((val, i) => seasonEps.indexOf(val) === i)
+                d3.select('#episodeSelector').selectAll('.episodeNums').remove()
+                d3.select('#episodeSelector').selectAll("option")
+                    .data(seasonEps)
+                    .enter().append('option')
+                    .attr('class', 'episodeNums')
+                    .attr('value', d => d)
+                    .text(d => d)
             }
         })
 
@@ -140,6 +172,20 @@ d3.csv('data/Supernatural.csv')
                 }
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+        })
+
+    d3.select('#episodeSelector')
+        .on('change',function() {
+            let selectedValue = d3.select('#seasonSelector').property('value')
+            if (selectedValue == 0) {
+                selectedValue =1
+            }
+            console.log(selectedValue)
+                
+            filtered = mainCastDialogue.filter(d => d.episodeNum == this.value && d.season == selectedValue)
+            console.log(filtered)
+            lineChart.data = filtered
+            lineChart.UpdateVis()
         })
 
 })
