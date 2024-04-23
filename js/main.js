@@ -69,7 +69,8 @@ d3.csv('data/Supernatural.csv')
     barchart.UpdateVis();
 
     wordcloud = new WordCloud({
-        parentElement: '#wordcloud'
+        parentElement: '#wordcloud',
+        title: 'Word Cloud'
     }, mainCastDialogue);
 
     phrases = new Phrases({
