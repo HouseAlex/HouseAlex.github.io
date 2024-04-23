@@ -25,6 +25,15 @@ class Phrases {
             .attr("height", vis.config.height)
             .append("g");
 
+        vis.svg.append("text")
+            .attr("x", vis.config.width / 2)
+            .attr("y", vis.config.margin.top)
+            .attr("text-anchor", "middle")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "24px")
+            .attr("fill", "black")
+            .text("Common Phrases");
+
         vis.UpdateVis();
     }
 
@@ -67,7 +76,7 @@ class Phrases {
     }
 
     phraseData(data, minLen, maxLen) {
-        const badArrays = ["  ", "uh   "]
+        const badArrays = ["  ", "uh   ", "  i", "so  "]
         const phraseMap = {};
 
         data.forEach(entry => {
@@ -76,7 +85,9 @@ class Phrases {
 
             lineWords.forEach(word => {
                 const cleanedWord = word.replace(/[^\w\s']/g, "").toLowerCase();
-                line.push(cleanedWord);
+                if (cleanedWord != "") {
+                    line.push(cleanedWord);
+                }
             });
 
             for (let i = minLen; i <= maxLen; i++) {

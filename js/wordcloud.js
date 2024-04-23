@@ -41,8 +41,8 @@ class WordCloud {
         vis.config.margin = {top: 20, right: 20, bottom: 20, left: 20};
         vis.config.width = 600;
         vis.config.height = 600;
-        vis.config.minFontSize = 10;
-        vis.config.maxFontSize = 70;
+        vis.config.minFontSize = 15;
+        vis.config.maxFontSize = 60;
         vis.config.textColor = "#000";
         vis.config.hoverColor = "#ff0";
 
@@ -66,14 +66,17 @@ class WordCloud {
             .attr("width", vis.config.width)
             .attr("height", vis.config.height)
             .append("g")
-            // .attr("transform", `translate(${vis.config.margin.left},${vis.config.margin.top})`);
-            //.style("stroke", "black")
-            //.style("stroke-width", 2);
 
-        // words.each(function (d) {
-        //     const wordElement = d3.select(this);
-        //     wordElement.attr("transform", `translate(${d.x},${d.y})`); // Adjust word positions
-        // });
+        // vis.svg.append("text")
+        //     .attr("x", vis.config.width / 2)
+        //     .attr("y", vis.config.margin.top)
+        //     .attr("text-anchor", "middle")
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "24px")
+        //     .attr("fill", "black")
+        //     .text("Word Cloud");
+
+
         vis.UpdateVis();
     }
 
@@ -105,8 +108,8 @@ class WordCloud {
 
         const simulation = d3.forceSimulation()
         .force("center", d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-        .force("charge", d3.forceManyBody().strength(-15))
-        .force("collide", d3.forceCollide().radius(d => d.radius + 2).strength(1))
+        .force("charge", d3.forceManyBody().strength(-17))
+        .force("collide", d3.forceCollide().radius(d => d.radius + 2).strength(1.75))
         .stop();
 
         const wordNodes = Object.entries(topWords).map(([word, frequency]) => {
@@ -134,7 +137,7 @@ class WordCloud {
             .attr("x", d => Math.max(d.radius + 20, Math.min(vis.config.width - d.radius, d.x)))
             .attr("y", d => Math.max(d.radius + 20, Math.min(vis.config.height - d.radius, d.y)))
             .attr("text-anchor", "middle")
-            .style("font-family", "fantasy, sans-serif");
+            .style("font-family", "fantasy, sans-serif")
     }
 
     fixTypos(word) {

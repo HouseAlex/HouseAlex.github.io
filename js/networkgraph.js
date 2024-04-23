@@ -33,6 +33,15 @@ class NetworkGraph {
                 vis.chart.attr("transform", transform)
             });
 
+        // vis.svg.append("text")
+        //     .attr("x", vis.config.width / 2)
+        //     .attr("y", vis.config.margin.top)
+        //     .attr("text-anchor", "middle")
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "24px")
+        //     .attr("fill", "black")
+        //     .text("Interaction Network");
+
         vis.svg.call(vis.zoom);        
 
         vis.frequencyScale = d3.scaleLinear()
