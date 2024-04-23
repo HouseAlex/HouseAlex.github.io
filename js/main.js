@@ -43,6 +43,10 @@ d3.csv('data/Supernatural.csv')
                 barchart.UpdateVis();
                 barchart2.data = mainCastDialogueOG
                 barchart2.UpdateVis();
+                wordcloud.data = mainCastDialogueOG
+                wordcloud.UpdateVis();
+                phrases.data = mainCastDialogueOG
+                phrases.UpdateVis();
             }
             else {
                 let filtered = mainCastDialogue.filter(d => d.season == this.value)
@@ -52,6 +56,10 @@ d3.csv('data/Supernatural.csv')
                 barchart.UpdateVis();
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+                wordcloud.data = filtered
+                wordcloud.UpdateVis();
+                phrases.data = filtered
+                phrases.UpdateVis();
             }
         })
 
@@ -77,7 +85,11 @@ d3.csv('data/Supernatural.csv')
         .on('change', function() {
                 let filtered = mainCastDialogue.filter(d => d.speaker == this.value)
                 barchart2.data = filtered
+                wordcloud.data = filtered
+                phrases.data = filtered
                 barchart2.UpdateVis();
+                wordcloud.UpdateVis();
+                phrases.UpdateVis();
         })
 
 
@@ -92,6 +104,10 @@ d3.csv('data/Supernatural.csv')
 
     wordcloud = new WordCloud({
         parentElement: '#wordcloud'
+    }, mainCastDialogue);
+
+    phrases = new Phrases({
+        parentElement: '#phrases'
     }, mainCastDialogue);
 
 })
