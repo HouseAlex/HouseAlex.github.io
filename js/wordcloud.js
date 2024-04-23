@@ -3,12 +3,14 @@ class WordCloud {
         this.config = _config;
         // this.dispatcher = _dispatcher;
         this.data = _data;
-        this.initVis();
+        this.isInitialized = false;
+        this.InitVis();
     }
 
-    initVis() {
+    InitVis() {
+        const vis = this;
 
-        let stopwords = [];
+        vis.stopwords = [];
 
         function loadStopwords() {
             const stopwordsFile = 'data/stop_words_english.txt'; // Path to your stopwords file
@@ -19,7 +21,7 @@ class WordCloud {
             if (xhr.status === 200) {
                 // File loaded successfully
                 const contents = xhr.responseText;
-                stopwords = compileStopwords(contents);
+                vis.stopwords = compileStopwords(contents);
             } else {
                 // Error loading file
                 console.error('Error loading stopwords file:', xhr.status);
@@ -32,16 +34,15 @@ class WordCloud {
 
         loadStopwords()
 
-        console.log("stopwords:", stopwords)
-    
-        const vis = this;
+        console.log("stopwords:", vis.stopwords)
+
         // const stopWords = [''];
 
         vis.config.margin = {top: 20, right: 20, bottom: 20, left: 20};
-        vis.config.width = 800;
+        vis.config.width = 600;
         vis.config.height = 600;
-        vis.config.minFontSize = 10;
-        vis.config.maxFontSize = 70;
+        vis.config.minFontSize = 15;
+        vis.config.maxFontSize = 60;
         vis.config.textColor = "#000";
         vis.config.hoverColor = "#ff0";
 
@@ -58,19 +59,6 @@ class WordCloud {
 
         const wordPositions = [];
 
-        const new_data = this.manipulateData(vis.data, stopwords);
-        // console.log("data", vis.data);
-        //console.log("word count", new_data.size)
-        //console.log("new_data", new_data);
-
-        const topWords = this.getTopWords(new_data, 50);
-        console.log("topWords", topWords);
-        
-
-        vis.fontSizeScale = d3.scaleLinear()
-            .domain([0, d3.max(Object.values(topWords))])
-            .range([vis.config.minFontSize, vis.config.maxFontSize]);
-
 
         // Set up SVG container
         vis.svg = d3.select(vis.config.parentElement)
@@ -78,7 +66,34 @@ class WordCloud {
             .attr("width", vis.config.width)
             .attr("height", vis.config.height)
             .append("g")
-            // .attr("transform", `translate(${vis.config.margin.left},${vis.config.margin.top})`);
+
+        // vis.svg.append("text")
+        //     .attr("x", vis.config.width / 2)
+        //     .attr("y", vis.config.margin.top)
+        //     .attr("text-anchor", "middle")
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "24px")
+        //     .attr("fill", "black")
+        //     .text("Word Cloud");
+
+
+        vis.UpdateVis();
+    }
+
+    UpdateVis() {
+
+        const vis = this;
+
+        if (this.isInitialized) {
+            this.words.remove();
+        } else {
+            this.isInitialized = true;
+        }
+
+        const new_data = this.manipulateData(vis.data, vis.stopwords);
+
+        const topWords = this.getTopWords(new_data, 50);
+        console.log("topWords", topWords);
 
         vis.svg.append("rect")
             .attr("x", 0)
@@ -86,14 +101,16 @@ class WordCloud {
             .attr("width", vis.config.width)
             .attr("height", vis.config.height)
             .style("fill", "none")
-            //.style("stroke", "black")
-            //.style("stroke-width", 2);
+
+        vis.fontSizeScale = d3.scaleLinear()
+            .domain([0, d3.max(Object.values(topWords))])
+            .range([vis.config.minFontSize, vis.config.maxFontSize]);
 
         const simulation = d3.forceSimulation()
-            .force("center", d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-            .force("charge", d3.forceManyBody().strength(-15))
-            .force("collide", d3.forceCollide().radius(d => d.radius + 2).strength(1))
-            .stop();
+        .force("center", d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
+        .force("charge", d3.forceManyBody().strength(-17))
+        .force("collide", d3.forceCollide().radius(d => d.radius + 2).strength(1.75))
+        .stop();
 
         const wordNodes = Object.entries(topWords).map(([word, frequency]) => {
             const fontSize = vis.fontSizeScale(frequency);
@@ -120,12 +137,7 @@ class WordCloud {
             .attr("x", d => Math.max(d.radius + 20, Math.min(vis.config.width - d.radius, d.x)))
             .attr("y", d => Math.max(d.radius + 20, Math.min(vis.config.height - d.radius, d.y)))
             .attr("text-anchor", "middle")
-            .style("font-family", "fantasy, sans-serif");
-
-        //vis.words.each(function (d) {
-        //    const wordElement = d3.select(this);
-        //    wordElement.attr("transform", `translate(${d.x},${d.y})`); // Adjust word positions
-        //});
+            .style("font-family", "fantasy, sans-serif")
     }
 
     fixTypos(word) {
@@ -240,6 +252,7 @@ class WordCloud {
                     return;
                 }
 
+                // TODO: Stem with "includes"
                 // const stemmedWord = this.stem(cleanedWord);
                 // const fixedWord = this.fixTypos(stemmedWord);
 

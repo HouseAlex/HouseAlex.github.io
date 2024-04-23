@@ -87,8 +87,13 @@
 }
 
 .screen-lower {
-    display: grid;
-    grid-template-columns: 3fr 3fr;
+    display: flex;
+    justify-content: space-between;
+    grid-gap: 10px;
+}
+
+.screen-lower > div {
+    flex: 1;
 }
 
 

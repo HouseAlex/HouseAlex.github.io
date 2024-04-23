@@ -82,7 +82,12 @@ d3.csv('data/Supernatural.csv')
     barchart.UpdateVis();
 
     wordcloud = new WordCloud({
-        parentElement: '#wordcloud'
+        parentElement: '#wordcloud',
+        title: 'Word Cloud'
+    }, mainCastDialogue);
+
+    phrases = new Phrases({
+        parentElement: '#phrases'
     }, mainCastDialogue);
 
     let episode1Data = mainCastDialogue.filter(d => d.season == 1 && d.episodeNum == 1)
@@ -116,6 +121,10 @@ d3.csv('data/Supernatural.csv')
                 }
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+                wordcloud.data = mainCastDialogueOG
+                wordcloud.UpdateVis();
+                phrases.data = mainCastDialogueOG
+                phrases.UpdateVis();
                 
                 seasonEps = mainCastDialogue.filter(d => d.season == 1).map(d => +d.episodeNum)
                 seasonEps = seasonEps.filter((val, i) => seasonEps.indexOf(val) === i)
@@ -149,6 +158,10 @@ d3.csv('data/Supernatural.csv')
                 }
                 barchart2.data = filtered
                 barchart2.UpdateVis();
+                wordcloud.data = filtered
+                wordcloud.UpdateVis();
+                phrases.data = filtered
+                phrases.UpdateVis();
 
                 seasonEps = mainCastDialogue.filter(d => d.season == this.value).map(d => +d.episodeNum)
                 seasonEps = seasonEps.filter((val, i) => seasonEps.indexOf(val) === i)
@@ -171,6 +184,8 @@ d3.csv('data/Supernatural.csv')
                     filtered = filtered.filter(d => d.season == selectedValue)
                 }
                 barchart2.data = filtered
+                wordcloud.data = filtered
+                phrases.data = filtered
                 barchart2.UpdateVis();
         })
 

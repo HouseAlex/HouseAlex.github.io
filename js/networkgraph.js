@@ -2,7 +2,7 @@ class NetworkGraph {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 800,
+            containerWidth: _config.containerWidth || 600,
             containerHeight: _config.containerHeight || 600,
             margin: _config.margin || {top: 45, right: 25, bottom: 40, left: 50},
             tooltipPadding: _config.tooltipPadding || 15,
@@ -32,6 +32,15 @@ class NetworkGraph {
                 const { transform } = event
                 vis.chart.attr("transform", transform)
             });
+
+        // vis.svg.append("text")
+        //     .attr("x", vis.config.width / 2)
+        //     .attr("y", vis.config.margin.top)
+        //     .attr("text-anchor", "middle")
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "24px")
+        //     .attr("fill", "black")
+        //     .text("Interaction Network");
 
         vis.svg.call(vis.zoom);        
 
