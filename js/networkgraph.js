@@ -2,7 +2,7 @@ class NetworkGraph {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 800,
+            containerWidth: _config.containerWidth || 600,
             containerHeight: _config.containerHeight || 600,
             margin: _config.margin || {top: 45, right: 25, bottom: 40, left: 50},
             tooltipPadding: _config.tooltipPadding || 15,

@@ -88,7 +88,8 @@
 
 .screen-lower {
     display: grid;
-    grid-template-columns: 3fr 3fr;
+    grid-template-columns: 3fr 1fr;
+    grid-gap: 10px;
 }
 
 
