@@ -39,7 +39,7 @@ class WordCloud {
         // const stopWords = [''];
 
         vis.config.margin = {top: 20, right: 20, bottom: 20, left: 20};
-        vis.config.width = 800;
+        vis.config.width = 600;
         vis.config.height = 600;
         vis.config.minFontSize = 10;
         vis.config.maxFontSize = 70;
