@@ -68,11 +68,13 @@ class WordCloud {
             .append("g")
 
         // vis.svg.append("text")
-        //     .attr("class", "chart-title")
-        //     .attr("x", vis.width / 2)
-        //     .attr("y", -10)
-        //     .style("text-anchor", "middle")
-        //     .text(vis.config.title);
+        //     .attr("x", vis.config.width / 2)
+        //     .attr("y", vis.config.margin.top)
+        //     .attr("text-anchor", "middle")
+        //     .attr("font-family", "sans-serif")
+        //     .attr("font-size", "24px")
+        //     .attr("fill", "black")
+        //     .text("Word Cloud");
 
 
         vis.UpdateVis();

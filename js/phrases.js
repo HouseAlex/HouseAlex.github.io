@@ -32,7 +32,7 @@ class Phrases {
             .attr("font-family", "sans-serif")
             .attr("font-size", "24px")
             .attr("fill", "black")
-            .text("Word Cloud");
+            .text("Common Phrases");
 
         vis.UpdateVis();
     }
