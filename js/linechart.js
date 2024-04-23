@@ -75,7 +75,13 @@ class LineChart {
             .y(function(d) { return vis.yScale(d.density)})
 
         
-    
+        // Title
+        vis.svg.append("text")
+            .attr("class", "chart-title")
+            .attr("x", (vis.width) / 2  + vis.config.margin.left)
+            .attr("y", 20)
+            .style("text-anchor", "middle")
+            .text("Lines by Character throughout Episode");
 
 
         vis.color = d3.scaleOrdinal()

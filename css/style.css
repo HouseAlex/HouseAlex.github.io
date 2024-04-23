@@ -92,6 +92,12 @@
     grid-gap: 10px;
 }
 
+.screen-bottom {
+    display: flex;
+    justify-content: space-between;
+    grid-gap: 10px;
+}
+
 .screen-lower > div {
     flex: 1;
 }
