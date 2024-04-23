@@ -72,6 +72,15 @@ d3.csv('data/Supernatural.csv')
         parentElement: '#wordcloud'
     }, mainCastDialogue);
 
+    let episode1Data = mainCastDialogue.filter(d => d.season == 1 && d.episodeNum == 1)
+    /*(for(let i = 0; i < episode1Data.length; i++) {
+        data[i].speaker = data[i].speaker.toUpperCase();
+    }*/
+    lineChart = new LineChart({
+        parentElement: '#episodeLineChart'
+    }, episode1Data);
+    lineChart.UpdateVis()
+
     // Season Selector updating NetworkGraph and BarChart
     d3.select('#seasonSelector')
         .on('change', function() {
